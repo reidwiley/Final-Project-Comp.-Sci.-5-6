@@ -1,0 +1,396 @@
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <time.h>
+#include <math.h>
+#include <sstream>
+
+using namespace std;
+using namespace sf;
+
+void Board (RenderWindow &, int[31][28]);
+void Score (RenderWindow &,int, Text &);
+
+class Ghosts
+{
+    public:
+    int r;
+    int xg ; // x position in screen...draw stuff based off of me!
+    int yg;
+    void Build(RenderWindow &);
+    void moveme(int[31][28],int);
+    Color b;
+    int timeg;
+    int ig;  // x position in matrix...locate stuff based off of me!
+    int jg;
+    FloatRect boundingBoxName;
+};
+
+int main()
+{
+    srand(time(NULL));
+    int x = 1;
+    int y = 1;
+    int counter = 0;
+    int direction = rand()%4+1;
+
+    Ghosts GhostP[4];
+    GhostP[0].b = Color::Cyan;
+    GhostP[1].b = Color::Red;
+    GhostP[2].b = Color::Yellow;
+    GhostP[3].b = Color(245,95,205);
+
+    GhostP[0].xg = 390;
+    GhostP[1].xg = 420;
+    GhostP[2].xg = 450;
+    GhostP[3].xg = 480;
+
+     GhostP[0].yg = 400;
+     GhostP[1].yg = 400;
+     GhostP[2].yg = 400;
+     GhostP[3].yg = 400;
+
+
+    RenderWindow window(VideoMode(840, 930), "PAC-MAN!");
+
+    CircleShape pacman(10.f);
+    pacman.setPosition(35,35);
+    pacman.setFillColor(Color::Yellow);
+
+    CircleShape mouth(9,3);
+    mouth.setPosition(42,54);
+    mouth.rotate(270);
+    mouth.setFillColor(Color::Black);
+
+    //FloatRect BoxPacman = pacman.getGlobalBounds();
+
+    int matrix[31][28] =
+    {
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,2,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,2,1},
+        {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1},
+        {1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1},
+        {1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1},
+        {1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1},
+        {3,3,3,3,3,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,3,3,3,3,3},
+        {3,3,3,3,3,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,3,3,3,3,3},
+        {3,3,3,3,3,1,0,1,1,0,1,1,1,3,3,1,1,1,0,1,1,0,1,3,3,3,3,3},
+        {1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1},
+        {0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0},
+        {1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1},
+        {3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3},
+        {3,3,3,3,3,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,3,3,3,3,3},
+        {3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3},
+        {1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1},
+        {1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1},
+        {1,2,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,2,1},
+        {1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1},
+        {1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1},
+        {1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1},
+        {1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1},
+        {1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3}
+    };
+
+    Font font;
+    if (!font.loadFromFile("AGENCYB.TTF"))
+       cout << "error loading font\n" ;
+
+    Text text;
+    text.setFont(font);
+    text.setCharacterSize(15);
+    text.setColor(Color::White);
+    text.setPosition(800,900);
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+             if (event.type == Event::Closed)
+                 window.close();
+
+              if(Keyboard::isKeyPressed(Keyboard::Left))
+              {
+                  if (x == 0 && y == 13)
+                  {
+                      mouth.move(810,0);
+                      pacman.move(810,0);
+                      x = 27;
+                      y = 13;
+                  }
+
+                 else if (matrix[y][x-1]== 0 or matrix[y][x-1] == 2 or matrix[y][x-1] == 4)
+                 {
+                    mouth.move(-30,0);
+                    pacman.move(-30,0);
+                    x--;
+
+                    if (matrix[y][x] == 0)
+                     {
+                         matrix[y][x] = 4;
+                         counter = counter+10;
+                     }
+                     else if (matrix[y][x] == 2)
+                     {
+                         matrix[y][x] = 4;
+                         counter = counter+50;
+                     }
+                 }
+             }
+             if(Keyboard::isKeyPressed(Keyboard::Right))
+             {
+                 if (x == 27 && y == 13)
+                  {
+                      mouth.move(-810,0);
+                      pacman.move(-810,0);
+                      x = 0;
+                      y = 13;
+                  }
+
+                 if(matrix[y][x+1]== 0 or matrix[y][x+1] == 2 or matrix[y][x+1] == 4)
+                 {
+                     mouth.move(30,0);
+                     pacman.move(30,0);
+                     x++;
+
+                    if (matrix[y][x] == 0)
+                     {
+                         matrix[y][x] = 4;
+                         counter = counter+10;
+                     }
+                     if (matrix[y][x] == 2)
+                     {
+                         matrix[y][x] = 4;
+                         counter = counter+50;
+                     }
+                 }
+             }
+             if(Keyboard::isKeyPressed(Keyboard::Up))
+             {
+                 if(matrix[y-1][x]== 0 or matrix[y-1][x] == 2 or matrix[y-1][x] == 4)
+                 {
+                     mouth.move(0,-30);
+                     pacman.move(0,-30);
+                     y--;
+
+                    if (matrix[y][x] == 0)
+                     {
+                         matrix[y][x] = 4;
+                         counter = counter+10;
+                     }
+                     if (matrix[y][x] == 2)
+                     {
+                         matrix[y][x] = 4;
+                         counter = counter+50;
+                     }
+                 }
+             }
+             if(Keyboard::isKeyPressed(Keyboard::Down))
+             {
+                 if(matrix[y+1][x]== 0 or matrix[y+1][x] == 2 or matrix[y+1][x] == 4)
+                 {
+                      mouth.move(0,30);
+                      pacman.move(0,30);
+                      y++;
+
+                    if (matrix[y][x] == 0)
+                     {
+                         matrix[y][x] = 4;
+                         counter = counter+10;
+                     }
+                     if (matrix[y][x] == 2)
+                     {
+                         matrix[y][x] = 4;
+                         counter = counter+50;
+                     }
+                 }
+             }
+
+
+
+         }
+
+         window.clear();
+         Board(window,matrix);
+         Score(window,counter,text);
+         window.draw(pacman);
+         window.draw(mouth);
+
+        for(int i = 0; i < 4; i++)
+            {
+             GhostP[i].moveme(matrix,direction);
+             GhostP[i].Build(window);
+            }
+         window.display();
+    }
+}
+
+void Board (RenderWindow &window, int matrix[31][28])
+{
+    RectangleShape tile(Vector2f(30,30));
+
+    CircleShape dot(2.f);
+    dot.setFillColor(Color::Yellow);
+
+    CircleShape powerPellet(5.f);
+    powerPellet.setFillColor(Color::Yellow);
+       for(int i = 0; i < 31; i++)
+       {
+            for (int j = 0; j < 28; j++)
+            {
+                tile.setPosition(j*30,i*30);
+                powerPellet.setPosition((j*30)+9,(i*30)+9);
+
+                    if (matrix[i][j] == 2)
+                    {
+                        tile.setFillColor(Color::Black);
+                        window.draw(tile);
+                        window.draw(powerPellet);
+                    }
+                    if (matrix[i][j] == 1)
+                    {
+                        tile.setFillColor(Color::Blue);
+                        window.draw(tile);
+                    }
+
+                    if (matrix[i][j] == 0)
+                    {
+                         tile.setFillColor(Color::Black);
+                         dot.setPosition((j*30)+11,(i*30)+12);
+                         window.draw(tile);
+                         window.draw(dot);
+                    }
+                    if (matrix[i][j] == 3 or matrix[i][j] == 4)
+                    {
+                        tile.setFillColor(Color::Black);
+                        window.draw(tile);
+                    }
+            }
+        }
+}
+
+void Score (RenderWindow &window, int counter, Text &text)
+{
+    string score;
+    stringstream q;
+    q << counter;
+    score = q.str();
+
+    text.setString(score);
+    window.draw(text);
+
+Font font;
+    if (!font.loadFromFile("AGENCYB.TTF"))
+       cout << "error loading font\n" ;
+
+    Text text2;
+    text2.setFont(font);
+    text2.setCharacterSize(24);
+    text2.setColor(Color::Black);
+    text2.setString("YOU WIN");
+    text2.setPosition(200,200);
+
+    if (counter == 3100)
+    {
+        window.clear(Color::Magenta);
+        window.draw(text2);
+        window.display();
+    }
+}
+
+void Ghosts::Build(RenderWindow &window)
+{
+    r = 20;
+
+    CircleShape Ghost(r);
+    Ghost.setFillColor(b);
+    Ghost.setPosition(xg,yg);
+    boundingBoxName = Ghost.getGlobalBounds();
+    CircleShape eyesa(10);
+    eyesa.setFillColor(Color::White);
+    eyesa.setPosition(xg+(r/2)-2,yg+(r/2));
+    CircleShape eyesb(10);
+    eyesb.setFillColor(Color::White);
+    eyesb.setPosition(xg+((r/2)+8),yg+(r/2));
+    CircleShape pupila(5);
+    pupila.setFillColor(Color::Black);
+    pupila.setPosition(xg+(r/2),yg+(r/2)+6);
+    CircleShape pupilb(5);
+    pupilb.setFillColor(Color::Black);
+    pupilb.setPosition(xg+((r/2)+12),yg+(r/2)+6);
+    CircleShape lega(4);
+    lega.setFillColor(b);
+    lega.setPosition(xg+(r/2)-8, yg+(r/2)+23);
+    CircleShape legb(4);
+    legb.setFillColor(b);
+    legb.setPosition(xg+(r/2)+2, yg+(r/2)+26);
+    CircleShape legc(4);
+    legc.setFillColor(b);
+    legc.setPosition(xg+(r/2)+12, yg+(r/2)+26);
+    CircleShape legd(4);
+    legd.setFillColor(b);
+    legd.setPosition(xg+(r/2)+22, yg+(r/2)+22);
+
+        window.draw(Ghost);
+        window.draw(eyesa);
+        window.draw(eyesb);
+        window.draw(pupila);
+        window.draw(pupilb);
+        window.draw(lega);
+        window.draw(legb);
+        window.draw(legc);
+        window.draw(legd);
+}
+
+void Ghosts::moveme(int matrix[31][28],int direction)
+{
+    //direction 1 = down, 2 = up, 3 = left, 4 = right
+    timeg = 1;
+    ig = xg/31;
+    jg = yg/31;
+
+               if(direction / 1 == 1 and matrix[jg-1 ][ig ]  == 0 or matrix[jg-1][ig] == 2 )
+                {
+                    yg=yg-1;
+                }
+                if(direction / 2 == 1 and matrix[jg+1][ig ]  == 0 or matrix[jg+1][ig] == 2 )
+               {
+                   yg=yg+1;
+               }
+                if(direction / 3 == 1 and matrix[jg][ig-1 ]  == 0 or matrix[jg][ig-1] == 2 )
+               {
+                   xg=xg-1;
+               }
+                if(direction / 4 == 1 and matrix[jg][ig+1 ]  == 0 or matrix[jg][ig+1] == 2)
+               {
+                   xg=xg+1;
+               }
+               else
+               {
+                   direction = rand()%4+1;
+               }
+
+
+
+        if(xg > 800 )
+            xg = 0;
+
+        if(xg < 0 )
+            xg = 800;
+
+        if(yg > 800)
+            yg = 0;
+
+        if(yg < 0)
+            yg = 800;
+
+             timeg++;
+
+}
