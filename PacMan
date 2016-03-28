@@ -9,6 +9,7 @@ using namespace sf;
 
 void Board (RenderWindow &, int[31][28]);
 void Score (RenderWindow &,int, Text &);
+void timer(RenderWindow & , bool);
 
 class Ghosts
 {
@@ -425,5 +426,46 @@ sprite.setScale(Vector2f(.1,.1)); // absolute scale factor
 window.draw(sprite);
 
 }
+void timer(RenderWindow &window, bool scatter)
+{
+Clock clock; // starts the clock
 
+Time elapsed = clock.getElapsedTime();
+cout << elapsed.asSeconds() << endl;
+
+
+if(elapsed.asSeconds() <= 7 )
+{
+    scatter = true;
+}
+if(elapsed.asSeconds() > 7 && elapsed.asSeconds() <= 27 )
+{
+    scatter = false;
+}
+if(elapsed.asSeconds() > 27 && elapsed.asSeconds() <= 34)
+{
+    scatter = true;
+}
+if(elapsed.asSeconds() > 34 && elapsed.asSeconds() <= 54 )
+{
+    scatter = false;
+}
+if(elapsed.asSeconds() > 54 && elapsed.asSeconds() <= 59)
+{
+    scatter = true;
+}
+if(elapsed.asSeconds() > 59)
+{
+    scatter = false;
+}
+
+//clock.restart();
+//sf::Time elapsed2 = clock.getElapsedTime();
+//std::cout << elapsed2.asSeconds() << std::endl;
+
+//Scatter for 7 seconds, then Chase for 20 seconds.
+//Scatter for 7 seconds, then Chase for 20 seconds.
+//Scatter for 5 seconds, then Chase for 20 seconds.
+//Scatter for 5 seconds, then switch to Chase mode permanently.
+}
 
