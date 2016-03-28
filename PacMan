@@ -13,41 +13,70 @@ void Score (RenderWindow &,int, Text &);
 class Ghosts
 {
     public:
-    int r;
     int xg ; // x position in screen...draw stuff based off of me!
     int yg;
-    void Build(RenderWindow &);
-    void moveme(int[31][28],int);
-    Color b;
-    int timeg;
+    //void moveme(int , int);
+    int r;
+    int g;
+    int b;
     int ig;  // x position in matrix...locate stuff based off of me!
     int jg;
-    FloatRect boundingBoxName;
+    Sprite sprite;
+    void Build(RenderWindow & );
+
 };
 
 int main()
 {
+
     srand(time(NULL));
     int x = 1;
     int y = 1;
-    int counter = 0;
+    int rad = 20;
+    int scorecounter = 0;
     int direction = rand()%4+1;
+    int mx = 0;
+    int my = 0;
+    int counter = 0;
+    bool scatter;
 
     Ghosts GhostP[4];
-    GhostP[0].b = Color::Cyan;
-    GhostP[1].b = Color::Red;
-    GhostP[2].b = Color::Yellow;
-    GhostP[3].b = Color(245,95,205);
 
-    GhostP[0].xg = 390;
-    GhostP[1].xg = 420;
-    GhostP[2].xg = 450;
-    GhostP[3].xg = 480;
+    GhostP[0].r = 0;
+    GhostP[1].r = 255;
+    GhostP[2].r = 0;
+    GhostP[3].r = 0;
+
+    GhostP[0].g = 255;
+    GhostP[1].g = 102;
+    GhostP[2].g = 0;
+    GhostP[3].g = 255;
+
+    GhostP[0].b = 0;
+    GhostP[1].b = 163;
+    GhostP[2].b = 255;
+    GhostP[3].b = 255;
+
+    GhostP[0].xg = 335;
+    GhostP[1].xg = 375;
+    GhostP[2].xg = 415;
+    GhostP[3].xg = 455;
 
      GhostP[0].yg = 400;
      GhostP[1].yg = 400;
      GhostP[2].yg = 400;
      GhostP[3].yg = 400;
+
+
+    GhostP[0].ig = 335/30;
+    GhostP[1].ig = 375/30;
+    GhostP[2].ig = 415/30;
+    GhostP[3].ig = 455/30;
+
+     GhostP[0].jg = 400/30;
+     GhostP[1].jg = 400/30;
+     GhostP[2].jg = 400/30;
+     GhostP[3].jg = 400/30;
 
 
     RenderWindow window(VideoMode(840, 930), "PAC-MAN!");
@@ -60,8 +89,6 @@ int main()
     mouth.setPosition(42,54);
     mouth.rotate(270);
     mouth.setFillColor(Color::Black);
-
-    //FloatRect BoxPacman = pacman.getGlobalBounds();
 
     int matrix[31][28] =
     {
@@ -76,10 +103,10 @@ int main()
         {1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1},
         {3,3,3,3,3,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,3,3,3,3,3},
         {3,3,3,3,3,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,3,3,3,3,3},
-        {3,3,3,3,3,1,0,1,1,0,1,1,1,3,3,1,1,1,0,1,1,0,1,3,3,3,3,3},
-        {1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1},
-        {0,0,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0},
-        {1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1},
+        {3,3,3,3,3,1,0,1,1,0,1,1,1,5,5,1,1,1,0,1,1,0,1,3,3,3,3,3},
+        {1,1,1,1,1,1,0,1,1,0,1,5,5,5,5,5,5,1,0,1,1,0,1,1,1,1,1,1},
+        {0,0,0,0,0,0,0,0,0,0,1,5,5,5,5,5,5,1,0,0,0,0,0,0,0,0,0,0},
+        {1,1,1,1,1,1,0,1,1,0,1,5,5,5,5,5,5,1,0,1,1,0,1,1,1,1,1,1},
         {3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3},
         {3,3,3,3,3,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,3,3,3,3,3},
         {3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3},
@@ -98,6 +125,8 @@ int main()
         {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3}
     };
 
+  //0 = black w/ small dot 2 = black w/ big dot 3 = plain black not ok to go on
+  //4 = plain black ok to go on 5 = black only ghost 1 = blue dont go
     Font font;
     if (!font.loadFromFile("AGENCYB.TTF"))
        cout << "error loading font\n" ;
@@ -135,12 +164,12 @@ int main()
                     if (matrix[y][x] == 0)
                      {
                          matrix[y][x] = 4;
-                         counter = counter+10;
+                         scorecounter = scorecounter+10;
                      }
                      else if (matrix[y][x] == 2)
                      {
                          matrix[y][x] = 4;
-                         counter = counter+50;
+                         scorecounter = scorecounter+50;
                      }
                  }
              }
@@ -163,12 +192,12 @@ int main()
                     if (matrix[y][x] == 0)
                      {
                          matrix[y][x] = 4;
-                         counter = counter+10;
+                         scorecounter = scorecounter+10;
                      }
                      if (matrix[y][x] == 2)
                      {
                          matrix[y][x] = 4;
-                         counter = counter+50;
+                         scorecounter = scorecounter+50;
                      }
                  }
              }
@@ -183,12 +212,12 @@ int main()
                     if (matrix[y][x] == 0)
                      {
                          matrix[y][x] = 4;
-                         counter = counter+10;
+                         scorecounter = scorecounter+10;
                      }
                      if (matrix[y][x] == 2)
                      {
                          matrix[y][x] = 4;
-                         counter = counter+50;
+                         scorecounter = scorecounter+50;
                      }
                  }
              }
@@ -203,34 +232,108 @@ int main()
                     if (matrix[y][x] == 0)
                      {
                          matrix[y][x] = 4;
-                         counter = counter+10;
+                         scorecounter = scorecounter+10;
                      }
                      if (matrix[y][x] == 2)
                      {
                          matrix[y][x] = 4;
-                         counter = counter+50;
+                         scorecounter = scorecounter+50;
                      }
                  }
              }
 
+             //ghosts movement
+             //direction 1 = up 2 = right 3 = down 4 = left
+for(int i = 0; i < 4; i++)
+{
+    if(direction == 4 )
+              {
+                    if (GhostP[i].ig == 0 && GhostP[i].jg == 13)
+                                {
+                                    GhostP[i].sprite.move(810,0);
+                                    GhostP[i].ig = 27 ;
+                                    GhostP[i].jg = 13 ;
+                                }
+                        if (matrix[y][x-1]== 0 or matrix[y][x-1] == 2 or matrix[y][x-1] == 4 or matrix[y][x-1] == 5)
+                                {
+                                    GhostP[i].sprite.move(-30,0);
+                                    GhostP[i].ig--;
+                                }
+                        else
+                        {
+                             direction = rand()%4+1;
+                        }
+             }
+
+        if(direction == 2 )
+             {
+
+                     if (GhostP[i].ig == 27 && GhostP[i].jg == 13)
+                        {
+                            GhostP[i].sprite.move(-812,0);
+                            GhostP[i].ig = 0;
+                            GhostP[i].jg = 13;
+                         }
+                if(matrix[y][x+1]== 0 or matrix[y][x+1] == 2 or matrix[y][x+1] == 4 or matrix[y][x+1] == 5)
+                 {
+                        GhostP[i].sprite.move(30,0);
+                        GhostP[i].ig++;
+                 }
+
+                else
+                 {
+                      direction = rand()%4+1;
+                 }
+
+            }
 
 
-         }
+        if(direction == 1 )
+             {
+                    if(matrix[y-1][x]== 0 or matrix[y-1][x] == 2 or matrix[y-1][x] == 4 or matrix[y-1][x] == 5)
+                        {
+                                GhostP[i].sprite.move(0,-30);
+                            GhostP[i].jg--;
+                        }
+
+                        else
+                        {
+                             direction = rand()%4+1;
+                        }
+            }
+
+
+        if( direction == 3 )
+             {
+                 if(matrix[y+1][x]== 0 or matrix[y+1][x] == 2 or matrix[y+1][x] == 4)
+                       {
+                            GhostP[i].sprite.move(0,30);
+                            GhostP[i].jg++;
+                        }
+
+                        else
+                        {
+                             direction = rand()%4+1;
+                        }
+            }
+
+}
 
          window.clear();
          Board(window,matrix);
-         Score(window,counter,text);
+         Score(window,scorecounter,text);
+         timer(window, scatter);
          window.draw(pacman);
          window.draw(mouth);
-
-        for(int i = 0; i < 4; i++)
-            {
-             GhostP[i].moveme(matrix,direction);
-             GhostP[i].Build(window);
-            }
+         for(int g = 0 ; g < 4; g++)
+         {
+             GhostP[g].Build(window);
+         }
          window.display();
     }
 }
+}
+
 
 void Board (RenderWindow &window, int matrix[31][28])
 {
@@ -276,11 +379,11 @@ void Board (RenderWindow &window, int matrix[31][28])
         }
 }
 
-void Score (RenderWindow &window, int counter, Text &text)
+void Score (RenderWindow &window, int scorecounter, Text &text)
 {
     string score;
     stringstream q;
-    q << counter;
+    q << scorecounter;
     score = q.str();
 
     text.setString(score);
@@ -292,105 +395,35 @@ Font font;
 
     Text text2;
     text2.setFont(font);
-    text2.setCharacterSize(24);
-    text2.setColor(Color::Black);
-    text2.setString("YOU WIN");
-    text2.setPosition(200,200);
+    text2.setCharacterSize(45);
+    text2.setColor(Color::Magenta);
+    text2.setString("YOU WIN!!!!!!");
+    text2.setPosition(420,465);
 
-    if (counter == 3100)
+    if (scorecounter == 3100)
     {
-        window.clear(Color::Magenta);
+        //window.clear(Color::Magenta);
         window.draw(text2);
-        window.display();
+        //window.display();
     }
 }
 
 void Ghosts::Build(RenderWindow &window)
 {
-    r = 20;
-
-    CircleShape Ghost(r);
-    Ghost.setFillColor(b);
-    Ghost.setPosition(xg,yg);
-    boundingBoxName = Ghost.getGlobalBounds();
-    CircleShape eyesa(10);
-    eyesa.setFillColor(Color::White);
-    eyesa.setPosition(xg+(r/2)-2,yg+(r/2));
-    CircleShape eyesb(10);
-    eyesb.setFillColor(Color::White);
-    eyesb.setPosition(xg+((r/2)+8),yg+(r/2));
-    CircleShape pupila(5);
-    pupila.setFillColor(Color::Black);
-    pupila.setPosition(xg+(r/2),yg+(r/2)+6);
-    CircleShape pupilb(5);
-    pupilb.setFillColor(Color::Black);
-    pupilb.setPosition(xg+((r/2)+12),yg+(r/2)+6);
-    CircleShape lega(4);
-    lega.setFillColor(b);
-    lega.setPosition(xg+(r/2)-8, yg+(r/2)+23);
-    CircleShape legb(4);
-    legb.setFillColor(b);
-    legb.setPosition(xg+(r/2)+2, yg+(r/2)+26);
-    CircleShape legc(4);
-    legc.setFillColor(b);
-    legc.setPosition(xg+(r/2)+12, yg+(r/2)+26);
-    CircleShape legd(4);
-    legd.setFillColor(b);
-    legd.setPosition(xg+(r/2)+22, yg+(r/2)+22);
-
-        window.draw(Ghost);
-        window.draw(eyesa);
-        window.draw(eyesb);
-        window.draw(pupila);
-        window.draw(pupilb);
-        window.draw(lega);
-        window.draw(legb);
-        window.draw(legc);
-        window.draw(legd);
-}
-
-void Ghosts::moveme(int matrix[31][28],int direction)
+    Texture texture;
+if (!texture.loadFromFile("Grayghost.png"))
 {
-    //direction 1 = down, 2 = up, 3 = left, 4 = right
-    timeg = 1;
-    ig = xg/31;
-    jg = yg/31;
+    // error...
+}
 
-               if(direction / 1 == 1 and matrix[jg-1 ][ig ]  == 0 or matrix[jg-1][ig] == 2 )
-                {
-                    yg=yg-1;
-                }
-                if(direction / 2 == 1 and matrix[jg+1][ig ]  == 0 or matrix[jg+1][ig] == 2 )
-               {
-                   yg=yg+1;
-               }
-                if(direction / 3 == 1 and matrix[jg][ig-1 ]  == 0 or matrix[jg][ig-1] == 2 )
-               {
-                   xg=xg-1;
-               }
-                if(direction / 4 == 1 and matrix[jg][ig+1 ]  == 0 or matrix[jg][ig+1] == 2)
-               {
-                   xg=xg+1;
-               }
-               else
-               {
-                   direction = rand()%4+1;
-               }
+sprite.setTexture(texture);
+sprite.setColor(Color(r,g,b));
+sprite.setPosition(Vector2f(ig*30,jg*30 )); // absolute position
+sprite.setScale(Vector2f(.1,.1)); // absolute scale factor
 
 
-
-        if(xg > 800 )
-            xg = 0;
-
-        if(xg < 0 )
-            xg = 800;
-
-        if(yg > 800)
-            yg = 0;
-
-        if(yg < 0)
-            yg = 800;
-
-             timeg++;
+window.draw(sprite);
 
 }
+
+
