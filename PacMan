@@ -90,16 +90,19 @@ int main()
     GhostP[3].color = "YellowGhostSpriteSheet.png";
 
     RenderWindow window(VideoMode(840, 930), "PAC-MAN!");
+    window.setFramerateLimit(80);
 
-    CircleShape pacman(10.f);
-    pacman.setPosition(35,35);
-    pacman.setFillColor(Color::Yellow);
+    Texture spriteSheet;
+    Sprite pacmansprite;
+    
+    int framepacman = 0;
+    int mouthcounter = 0;
 
-    CircleShape mouth(9,3);
-    mouth.setPosition(42,54);
-    mouth.rotate(270);
-    mouth.setFillColor(Color::Black);
-
+    spriteSheet.loadFromFile("pacmanall.png");
+    pacmansprite.setTexture(spriteSheet);
+    pacmansprite.setPosition(30,30);
+    pacmansprite.setScale(1.29,1.29);
+    
     int matrix[31][28] =
     {
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -162,103 +165,258 @@ for(int k = 0; k < 4; k++)
              if (event.type == Event::Closed)
                  window.close();
 
-              if(Keyboard::isKeyPressed(Keyboard::Left))
-              {
-                  if (x == 0 && y == 13)
-                  {
-                      mouth.move(810,0);
-                      pacman.move(810,0);
-                      x = 27;
-                      y = 13;
-                  }
+              
 
-                 else if (matrix[y][x-1]== 0 or matrix[y][x-1] == 2 or matrix[y][x-1] == 4)
+if(Keyboard::isKeyPressed(Keyboard::Left))
+
+              {
+
+                if(mouthcounter % 2 == 0)
+
+                {
+
+                    framepacman = 1;
+
+                    pacmansprite.setTextureRect(IntRect(framepacman*20,0,22,22));
+
+                }
+
+                if(mouthcounter % 2 == 1)
+
+                {
+
+                    framepacman = 0;
+
+                    pacmansprite.setTextureRect(IntRect(framepacman*20,0,22,22));
+
+                }
+
+                if(x == 0 && y == 13)
+
+                {
+
+                    pacmansprite.move(810,0);
+
+                    x = 27;
+
+                    y = 13;
+
+                }
+
+                if (matrix[y][x-1]== 0 or matrix[y][x-1] == 2 or matrix[y][x-1] == 4)
+
                  {
-                    mouth.move(-30,0);
-                    pacman.move(-30,0);
+
+                     pacmansprite.move(-30,0);
+
                     x--;
 
                     if (matrix[y][x] == 0)
+
                      {
+
                          matrix[y][x] = 4;
+
                          scorecounter = scorecounter+10;
+
                      }
+
                      else if (matrix[y][x] == 2)
+
                      {
+
                          matrix[y][x] = 4;
+
                          scorecounter = scorecounter+50;
+
                      }
+
                  }
+
              }
+
              if(Keyboard::isKeyPressed(Keyboard::Right))
+
              {
-                 if (x == 27 && y == 13)
-                  {
-                      mouth.move(-810,0);
-                      pacman.move(-810,0);
-                      x = 0;
-                      y = 13;
-                  }
+
+                 if(mouthcounter % 2 == 0)
+
+                {
+
+                    framepacman = 1;
+
+                    pacmansprite.setTextureRect(IntRect(framepacman*20,20,22,22));
+
+                }
+
+                if(mouthcounter % 2 == 1)
+
+                {
+
+                    framepacman = 0;
+
+                    pacmansprite.setTextureRect(IntRect(framepacman*20,20,22,22));
+
+                }
+
+                 if(x == 27 && y == 13)
+
+                 {
+
+                     pacmansprite.move(-810,0);
+
+                     x = 0;
+
+                     y = 13;
+
+                 }
 
                  if(matrix[y][x+1]== 0 or matrix[y][x+1] == 2 or matrix[y][x+1] == 4)
+
                  {
-                     mouth.move(30,0);
-                     pacman.move(30,0);
+
+                     pacmansprite.move(30,0);
+
                      x++;
 
                     if (matrix[y][x] == 0)
+
                      {
+
                          matrix[y][x] = 4;
+
                          scorecounter = scorecounter+10;
+
                      }
+
                      if (matrix[y][x] == 2)
+
                      {
+
                          matrix[y][x] = 4;
+
                          scorecounter = scorecounter+50;
+
                      }
+
                  }
+
              }
+
              if(Keyboard::isKeyPressed(Keyboard::Up))
+
              {
+
+                 if(mouthcounter % 2 == 0)
+
+                {
+
+                    framepacman = 1;
+
+                    pacmansprite.setTextureRect(IntRect(framepacman*20,40,22,22));
+
+                }
+
+                if(mouthcounter % 2 == 1)
+
+                {
+
+                    framepacman = 0;
+
+                    pacmansprite.setTextureRect(IntRect(framepacman*20,40,22,22));
+
+                }
+
                  if(matrix[y-1][x]== 0 or matrix[y-1][x] == 2 or matrix[y-1][x] == 4)
+
                  {
-                     mouth.move(0,-30);
-                     pacman.move(0,-30);
+
+                     pacmansprite.move(0,-30);
+
                      y--;
 
                     if (matrix[y][x] == 0)
+
                      {
+
                          matrix[y][x] = 4;
+
                          scorecounter = scorecounter+10;
+
                      }
+
                      if (matrix[y][x] == 2)
+
                      {
+
                          matrix[y][x] = 4;
+
                          scorecounter = scorecounter+50;
+
                      }
+
                  }
+
              }
+
              if(Keyboard::isKeyPressed(Keyboard::Down))
+
              {
+
+                if(mouthcounter % 2 == 0)
+
+                {
+
+                    framepacman = 1;
+
+                    pacmansprite.setTextureRect(IntRect(framepacman*20,60,22,22));
+
+                }
+
+                if(mouthcounter % 2 == 1)
+
+                {
+
+                    framepacman = 0;
+
+                    pacmansprite.setTextureRect(IntRect(framepacman*20,61,22,22));
+
+                }
+
                  if(matrix[y+1][x]== 0 or matrix[y+1][x] == 2 or matrix[y+1][x] == 4)
+
                  {
-                      mouth.move(0,30);
-                      pacman.move(0,30);
+
+                     pacmansprite.move(0,30);
+
                       y++;
 
                     if (matrix[y][x] == 0)
+
                      {
+
                          matrix[y][x] = 4;
+
                          scorecounter = scorecounter+10;
+
                      }
+
                      if (matrix[y][x] == 2)
+
                      {
+
                          matrix[y][x] = 4;
+
                          scorecounter = scorecounter+50;
+
                      }
+
                  }
+
              }
- }
+
+             mouthcounter++;
+
 //ghosts movement
 //direction 1 = up 2 = right 3 = down 4 = left
 
