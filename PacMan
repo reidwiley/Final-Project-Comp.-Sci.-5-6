@@ -8,7 +8,7 @@ using namespace std;
 using namespace sf;
 
 void Board (RenderWindow &, int[31][28]);
-void Score (RenderWindow &,int, Text &, Font &);
+void Score (RenderWindow &,int, Text &, Font &, Clock &);
 void timer(RenderWindow & , bool, Clock );
 
 class Ghosts
@@ -28,9 +28,8 @@ class Ghosts
 };
 //http://gameinternals.com/post/2072558330/understanding-pac-man-ghost-behavior
 //The first fruit appears when Pac-Man has eaten 70 of the dots in the maze, and the second when 170 have been eaten.
-int main()
+int main(int argc, char ** argv)
 {
-
     srand(time(NULL));
     int x = 1;
     int y = 1;
@@ -90,19 +89,11 @@ int main()
     GhostP[3].color = "YellowGhostSpriteSheet.png";
 
     RenderWindow window(VideoMode(840, 930), "PAC-MAN!");
+
+
+
     window.setFramerateLimit(80);
 
-    Texture spriteSheet;
-    Sprite pacmansprite;
-    
-    int framepacman = 0;
-    int mouthcounter = 0;
-
-    spriteSheet.loadFromFile("pacmanall.png");
-    pacmansprite.setTexture(spriteSheet);
-    pacmansprite.setPosition(30,30);
-    pacmansprite.setScale(1.29,1.29);
-    
     int matrix[31][28] =
     {
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -118,7 +109,7 @@ int main()
         {3,3,3,3,3,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,3,3,3,3,3},
         {3,3,3,3,3,1,0,1,1,0,1,1,1,5,5,1,1,1,0,1,1,0,1,3,3,3,3,3},
         {1,1,1,1,1,1,0,1,1,0,1,5,5,5,5,5,5,1,0,1,1,0,1,1,1,1,1,1},
-        {0,0,0,0,0,0,0,0,0,0,1,5,5,5,5,5,5,1,0,0,0,0,0,0,0,0,0,0},
+        {4,0,0,0,0,0,0,0,0,0,1,5,5,5,5,5,5,1,0,0,0,0,0,0,0,0,0,4},
         {1,1,1,1,1,1,0,1,1,0,1,5,5,5,5,5,5,1,0,1,1,0,1,1,1,1,1,1},
         {3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3},
         {3,3,3,3,3,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,3,3,3,3,3},
@@ -150,10 +141,22 @@ int main()
     text.setColor(Color::White);
     text.setPosition(800,900);
 
+    Texture spriteSheet;
+    Sprite pacmansprite;
+
+    int framepacman = 0;
+    int mouthcounter = 0;
+
+    spriteSheet.loadFromFile("pacmanall.png");
+
+    pacmansprite.setTexture(spriteSheet);
+    pacmansprite.setPosition(28,28);
+    pacmansprite.setScale(1.29,1.29);
+    pacmansprite.setTextureRect(IntRect(2*21,0,21,21));
+
 for(int k = 0; k < 4; k++)
 {
     GhostP[k].texture.loadFromFile(GhostP[k].color);
-
     GhostP[k].sprite.setTexture(GhostP[k].texture);
 }
 
@@ -165,10 +168,9 @@ for(int k = 0; k < 4; k++)
              if (event.type == Event::Closed)
                  window.close();
 
-              
 
-if(Keyboard::isKeyPressed(Keyboard::Left))
 
+            if(Keyboard::isKeyPressed(Keyboard::Left))
               {
 
                 if(mouthcounter % 2 == 0)
@@ -177,7 +179,7 @@ if(Keyboard::isKeyPressed(Keyboard::Left))
 
                     framepacman = 1;
 
-                    pacmansprite.setTextureRect(IntRect(framepacman*20,0,22,22));
+                    pacmansprite.setTextureRect(IntRect(framepacman*21,0,21,21));
 
                 }
 
@@ -187,7 +189,7 @@ if(Keyboard::isKeyPressed(Keyboard::Left))
 
                     framepacman = 0;
 
-                    pacmansprite.setTextureRect(IntRect(framepacman*20,0,22,22));
+                    pacmansprite.setTextureRect(IntRect(framepacman*21,0,21,21));
 
                 }
 
@@ -245,7 +247,7 @@ if(Keyboard::isKeyPressed(Keyboard::Left))
 
                     framepacman = 1;
 
-                    pacmansprite.setTextureRect(IntRect(framepacman*20,20,22,22));
+                    pacmansprite.setTextureRect(IntRect(framepacman*21,20,21,21));
 
                 }
 
@@ -255,7 +257,7 @@ if(Keyboard::isKeyPressed(Keyboard::Left))
 
                     framepacman = 0;
 
-                    pacmansprite.setTextureRect(IntRect(framepacman*20,20,22,22));
+                    pacmansprite.setTextureRect(IntRect(framepacman*21,20,21,21));
 
                 }
 
@@ -313,7 +315,7 @@ if(Keyboard::isKeyPressed(Keyboard::Left))
 
                     framepacman = 1;
 
-                    pacmansprite.setTextureRect(IntRect(framepacman*20,40,22,22));
+                    pacmansprite.setTextureRect(IntRect(framepacman*21,40,21,21));
 
                 }
 
@@ -323,7 +325,7 @@ if(Keyboard::isKeyPressed(Keyboard::Left))
 
                     framepacman = 0;
 
-                    pacmansprite.setTextureRect(IntRect(framepacman*20,40,22,22));
+                    pacmansprite.setTextureRect(IntRect(framepacman*21,40,21,21));
 
                 }
 
@@ -369,7 +371,7 @@ if(Keyboard::isKeyPressed(Keyboard::Left))
 
                     framepacman = 1;
 
-                    pacmansprite.setTextureRect(IntRect(framepacman*20,60,22,22));
+                    pacmansprite.setTextureRect(IntRect(framepacman*21,60,21,21));
 
                 }
 
@@ -379,7 +381,7 @@ if(Keyboard::isKeyPressed(Keyboard::Left))
 
                     framepacman = 0;
 
-                    pacmansprite.setTextureRect(IntRect(framepacman*20,61,22,22));
+                    pacmansprite.setTextureRect(IntRect(framepacman*21,61,21,21));
 
                 }
 
@@ -416,6 +418,7 @@ if(Keyboard::isKeyPressed(Keyboard::Left))
              }
 
              mouthcounter++;
+        }
 
 //ghosts movement
 //direction 1 = up 2 = right 3 = down 4 = left
@@ -511,10 +514,9 @@ for(int g = 0; g < 4; g++)
 
          window.clear();
          Board(window,matrix);
-         Score(window,scorecounter,text, font);
+         Score(window,scorecounter,text, font, clock);
          timer(window, scatter,clock);
-         window.draw(pacman);
-         window.draw(mouth);
+         window.draw(pacmansprite);
          for(int v = 0 ; v < 4; v++)
          {
             window.draw(GhostP[v].sprite);
@@ -568,7 +570,7 @@ void Board (RenderWindow &window, int matrix[31][28])
         }
 }
 
-void Score (RenderWindow &window, int scorecounter, Text &text, Font &font)
+void Score (RenderWindow &window, int scorecounter, Text &text, Font &font, Clock &clock)
 {
     string score;
     stringstream q;
@@ -583,9 +585,25 @@ void Score (RenderWindow &window, int scorecounter, Text &text, Font &font)
     win.setCharacterSize(45);
     win.setColor(Color::Magenta);
     win.setString("YOU WIN!!!!!!");
-    win.setPosition(420,465);
+    win.setPosition(330,372);
 
-    if (scorecounter == 3100)
+    Time elapsed = clock.getElapsedTime();
+
+    stringstream ss;
+    ss<<elapsed.asSeconds();
+    string timer1 = ss.str();
+
+    ///ss<<clock.getElapsedTime();
+
+    Text timerd;
+    timerd.setFont(font);
+    timerd.setColor(Color::White);
+    timerd.setString(timer1);
+    timerd.setPosition(0,900);
+
+    window.draw(timerd);
+
+    if (scorecounter == 3080)
     {
         window.draw(win);
     }
